@@ -1,0 +1,112 @@
+// @1.1.2
+// Author: AmaseCocoa
+// License: MIT
+
+var timerTime = 0
+var timerRemain = 0
+var isTimerEnded = false
+
+@addTime(s) {
+	timerTime = timerTime + s
+	Ui:get("timerText").update({text: `$[x2 {timerTime}s]`})
+}
+
+@resetTime() {
+	timerTime = 0
+	Ui:get("timerText").update({text: `$[x2 {timerTime}s]`})
+}
+
+@disableTimerButton(){
+    Ui:get("timerButtons").update({buttons: [
+        {text: "-1m", onClick: @(){addTime(-60)}, disabled: true}
+        {text: "-10s", onClick: @(){addTime(-10)}, disabled: true}
+        {text: "リセット", onClick: resetTime, disabled: true}
+        {text: "+10s", onClick: @(){addTime(10)}, disabled: true}
+        {text: "+1m", onClick: @(){addTime(60)}, disabled: true}
+    ]})
+}
+
+@enableTimerButton(){
+    Ui:get("timerButtons").update({buttons: [
+        {text: "-1m", onClick: @(){addTime(-60)}, disabled: false}
+        {text: "-10s", onClick: @(){addTime(-10)}, disabled: false}
+        {text: "リセット", onClick: resetTime, disabled: false}
+        {text: "+10s", onClick: @(){addTime(10)}, disabled: false}
+        {text: "+1m", onClick: @(){addTime(60)}, disabled: false}
+    ]})
+}
+
+
+@startTimer(){
+    var startedTime = Date:now()
+    var endTime = startedTime + (timerTime * 1000)
+    isTimerEnded = false
+        
+    disableTimerButton()
+    
+    @stopTimer(){
+       isTimerEnded = true
+       timerTime = timerRemain
+       enableTimerButton()
+       Ui:get("timerStart").update({text: "スタート", onClick: startTimer})
+       Ui:get("timerText").update({text: `$[x2 {timerRemain}s]`})
+    }
+    
+     Ui:get("timerStart").update({text: "ストップ", onClick: stopTimer})
+    
+    while !isTimerEnded {
+         timerRemain = Math:floor((endTime - Date:now()) / 1000)
+       
+        if timerRemain < 0 {  
+            timerRemain = 0  
+        }
+        
+        if timerRemain == 0 {
+           Ui:get("timerText").update({text: `$[fg.color=red $[tada $[x2 {timerRemain}s]]]`})
+        } elif timerRemain <= 5 {
+           Ui:get("timerText").update({text: `$[fg.color=red $[x2 {timerRemain}s]]`})
+        } else {
+           Ui:get("timerText").update({text: `$[x2 {timerRemain}s]`})
+        }
+        
+        
+        if Date:now() >= endTime {
+          isTimerEnded = true
+          enableTimerButton()
+          Ui:get("timerStart").update({text: "スタート", onClick: startTimer})
+          Mk:dialog("！！！", "時間になりました！", "info")
+          Ui:get("timerText").update({text: `$[x2 {timerRemain}s]`})
+        } else {
+          Core:sleep(1000)
+        }
+    }
+}
+
+Ui:render([
+    Ui:C:container({
+        children: [
+            Ui:C:text({text: "タイマー"})
+            Ui:C:container({
+                children: [
+                    Ui:C:mfm({text: `$[x2 {timerTime}s]`}, "timerText")
+                    Ui:C:buttons({
+                        buttons: [
+                            {text: "-1m", onClick: @(){addTime(-60)}}
+                            {text: "-10s", onClick: @(){addTime(-10)}}
+                            {text: "リセット", onClick: resetTime}
+                            {text: "+10s", onClick: @(){addTime(10)}}
+                            {text: "+1m", onClick: @(){addTime(60)}}
+                        ]
+                    }, "timerButtons")
+                ]
+                align: 'center'
+                padding: 1
+                rounded: false
+                borderRadius: 1
+                hidden: false
+            })
+            Ui:C:button({text: "スタート", onClick: startTimer}, "timerStart")
+        ],
+        align: 'center'
+    })
+])
