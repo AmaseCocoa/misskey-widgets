@@ -1,7 +1,7 @@
 // @1.1.2
 // Author: AmaseCocoa
 // License: MIT
-// Version: 0.1.0
+// Version: 0.1.1
 
 var timerTime = 0
 var timerRemain = 0
@@ -62,11 +62,23 @@ var isTimerEnded = false
        isTimerEnded = true
        timerTime = timerRemain
        enableTimerButton()
-       Ui:get("timerStart").update({text: "スタート", onClick: startTimer})
+       Ui:get("timerControls").update({
+           buttons: [
+                  {text: "ロード", onClick: @(){}, disabled: false}
+                  {text: "スタート", onClick: startTimer}
+                  {text: "セーブ", onClick: @(){}, disabled: false}
+              ]
+       })
        Ui:get("timerText").update({text: `$[x2 {calculateTime(timerRemain)}s]`})
     }
     
-     Ui:get("timerStart").update({text: "ストップ", onClick: stopTimer})
+     Ui:get("timerControls").update({
+           buttons: [
+                  {text: "ロード", onClick: @(){}, disabled: true}
+                  {text: "ストップ", onClick: stopTimer}
+                  {text: "セーブ", onClick: @(){}, disabled: true}
+              ]
+      })
     
     while !isTimerEnded {
          timerRemain = Math:floor((endTime - Date:now()) / 1000)
@@ -87,7 +99,13 @@ var isTimerEnded = false
         if Date:now() >= endTime {
           isTimerEnded = true
           enableTimerButton()
-          Ui:get("timerStart").update({text: "スタート", onClick: startTimer})
+          Ui:get("timerControls").update({
+              buttons: [
+                     {text: "ロード", onClick: @(){}, disabled: false}
+                     {text: "スタート", onClick: startTimer}
+                     {text: "セーブ", onClick: @(){}, disabled: false}
+                 ]
+          })
           Mk:dialog("！！！", "時間になりました！", "info")
           Ui:get("timerText").update({text: `$[x2 {calculateTime(timerRemain)}s]`})
         } else {
@@ -119,7 +137,13 @@ Ui:render([
                 borderRadius: 1
                 hidden: false
             })
-            Ui:C:button({text: "スタート", onClick: startTimer}, "timerStart")
+            Ui:C:buttons({
+                        buttons: [
+                            {text: "ロード", onClick: @(){}}
+                            {text: "スタート", onClick: startTimer}
+                            {text: "セーブ", onClick: @(){}}
+                        ]
+            }, "timerControls")
         ],
         align: 'center'
     })
