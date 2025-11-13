@@ -1,19 +1,33 @@
 // @1.1.2
 // Author: AmaseCocoa
 // License: MIT
+// Version: 0.1.0
 
 var timerTime = 0
 var timerRemain = 0
 var isTimerEnded = false
 
+@calculateTime(time){
+    var minutes = Math:floor(time / 60)
+    var remaining_seconds = time % 60
+    var calculatedTime = "UNKNOWN"
+    if minutes != 0 {
+        calculatedTime = `{minutes}m{remaining_seconds}`
+    } else {
+        calculatedTime = `{remaining_seconds}`
+    }
+    
+    return calculatedTime
+}
+
 @addTime(s) {
 	timerTime = timerTime + s
-	Ui:get("timerText").update({text: `$[x2 {timerTime}s]`})
+	Ui:get("timerText").update({text: `$[x2 {calculateTime(timerTime)}s]`})
 }
 
 @resetTime() {
 	timerTime = 0
-	Ui:get("timerText").update({text: `$[x2 {timerTime}s]`})
+	Ui:get("timerText").update({text: `$[x2 {calculateTime(timerTime)}s]`})
 }
 
 @disableTimerButton(){
@@ -49,7 +63,7 @@ var isTimerEnded = false
        timerTime = timerRemain
        enableTimerButton()
        Ui:get("timerStart").update({text: "スタート", onClick: startTimer})
-       Ui:get("timerText").update({text: `$[x2 {timerRemain}s]`})
+       Ui:get("timerText").update({text: `$[x2 {calculateTime(timerRemain)}s]`})
     }
     
      Ui:get("timerStart").update({text: "ストップ", onClick: stopTimer})
@@ -62,11 +76,11 @@ var isTimerEnded = false
         }
         
         if timerRemain == 0 {
-           Ui:get("timerText").update({text: `$[fg.color=red $[tada $[x2 {timerRemain}s]]]`})
+           Ui:get("timerText").update({text: `$[fg.color=red $[tada $[x2 {calculateTime(timerRemain)}s]]]`})
         } elif timerRemain <= 5 {
-           Ui:get("timerText").update({text: `$[fg.color=red $[x2 {timerRemain}s]]`})
+           Ui:get("timerText").update({text: `$[fg.color=red $[x2 {calculateTime(timerRemain)}s]]`})
         } else {
-           Ui:get("timerText").update({text: `$[x2 {timerRemain}s]`})
+           Ui:get("timerText").update({text: `$[x2 {calculateTime(timerRemain)}s]`})
         }
         
         
@@ -75,7 +89,7 @@ var isTimerEnded = false
           enableTimerButton()
           Ui:get("timerStart").update({text: "スタート", onClick: startTimer})
           Mk:dialog("！！！", "時間になりました！", "info")
-          Ui:get("timerText").update({text: `$[x2 {timerRemain}s]`})
+          Ui:get("timerText").update({text: `$[x2 {calculateTime(timerRemain)}s]`})
         } else {
           Core:sleep(1000)
         }
